@@ -18,7 +18,7 @@ const LoginScreen = () => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
-        setKeyboardVisible(true); // or some other action
+        setKeyboardVisible(true); 
       }
     );
     const keyboardDidHideListener = Keyboard.addListener(
@@ -61,9 +61,9 @@ const LoginScreen = () => {
           <Text style={styles.appName}>
             <Text style={styles.blueText}>HIPERTROF</Text>
             <Text style={styles.orangeText}>.IA</Text>
-          </Text>
+          </Text> 
         )}
-        <Text style={styles.descriptionText}>Digite sua senha e email para entrar</Text>
+        <Text style={styles.descriptionText}>Digite seu email e senha para entrar</Text>
       <TextInput
         style={styles.input}
         placeholder="Email ou nome de usuário"
@@ -110,12 +110,14 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   descriptionText: {
+    position:'relative',
     marginLeft:0,
     color: '#fff',
     fontSize: 18,
     marginTop: -100,
     marginBottom:30, // Adicione o espaçamento desejado entre os textos
     fontFamily: 'CorporateSBold',
+    opacity:0.5,
   },
   appName: {
     position: 'absolute',

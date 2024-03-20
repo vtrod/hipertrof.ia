@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -15,6 +15,27 @@ const EsqueciSenhaScreen = () => {
   const navigateToLoginScreen = () => {
     navigation.navigate('LoginScreen');
   };
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true); 
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   return (
     <KeyboardAvoidingView behavior={null} style={{ flex: 1 }}>
@@ -22,10 +43,12 @@ const EsqueciSenhaScreen = () => {
         <TouchableOpacity style={styles.backButton} onPress={navigateToLoginScreen}>
           <MaterialIcons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
+        {!isKeyboardVisible && (
         <Text style={styles.appName}>
           <Text style={styles.blueText}>HIPERTROF</Text>
           <Text style={styles.orangeText}>.IA</Text>
         </Text>
+                )}
         <Text style={styles.resetPasswordTitle}>Redefina sua senha</Text>
         <Text style={styles.resetPasswordDescription}>Insira seu email abaixo e enviaremos um link para você redefinir sua senha.</Text>
         <TextInput
