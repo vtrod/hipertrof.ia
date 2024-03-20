@@ -65,7 +65,7 @@ const CadastroScreen = () => {
       Alert.alert('Erro', 'Você deve aceitar os termos e condições para continuar.');
       return;
     }
-    if (!nome || !email || !senha ) {
+    if (!nome || !email || !senha || !confirmarSenha) {
       Alert.alert('Erro', 'Todos os campos são obrigatórios.');
       return;
     }
