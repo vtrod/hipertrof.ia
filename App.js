@@ -6,6 +6,8 @@ import InicioScreen from './src/views/Servicos/InicioScreen';
 import IndexScreen from './src/views/Servicos/IndexScreen';
 import LoginScreen from './src/views/Servicos/LoginScreen';
 import CadastroScreen from './src/views/Servicos/CadastroScreen';
+import EsqueciSenhaScreen from './src/views/Servicos/EsqueciSenhaScreen';
+
 
 const Stack = createStackNavigator();
 
@@ -13,10 +15,11 @@ const AppNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Index">
-        <Stack.Screen name="Index" component={IndexScreen} />
-        <Stack.Screen name="Inicio" component={InicioScreen} />
+        <Stack.Screen name="IndexScreen" component={IndexScreen} />
+        <Stack.Screen name="InicioScreen" component={InicioScreen} />
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
         <Stack.Screen name="CadastroScreen" component={CadastroScreen} />
+        <Stack.Screen name="EsqueciSenhaScreen" component={EsqueciSenhaScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

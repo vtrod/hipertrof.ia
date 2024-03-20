@@ -1,25 +1,97 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { MaterialIcons } from '@expo/vector-icons'; // Importe o pacote de ícones
+
+const InputField = ({ placeholder, secureTextEntry }) => (
+  <TextInput style={styles.input} placeholder={placeholder} placeholderTextColor="#fff" secureTextEntry={secureTextEntry} />
+);
+
+const Button = ({ text, onPress, disabled }) => (
+  <TouchableOpacity style={[styles.loginButton, disabled && styles.disabledButton]} onPress={onPress} disabled={disabled}>
+    <Text style={styles.loginButtonText}>{text}</Text>
+  </TouchableOpacity>
+);
+
+const CheckBox = ({ label, checked, onChange }) => (
+  <View style={styles.checkBox}>
+    <TouchableOpacity onPress={onChange}>
+      <MaterialIcons name={checked ? 'check-box' : 'check-box-outline-blank'} size={24} color={checked ? '#FFA000' : '#fff'} />
+    </TouchableOpacity>
+    <Text style={styles.checkBoxLabel}>{label}</Text>
+  </View>
+);
 
 const CadastroScreen = () => {
   const navigation = useNavigation();
+  const [checked, setChecked] = useState(false);
+  const [keyboardStatus, setKeyboardStatus] = useState(false);
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
+
+  
+  const navigateToInicioScreen = () => {
+    navigation.navigate('InicioScreen');
+  };
 
   const handleNavigateBack = () => {
+    if (!checked) {
+      Alert.alert('Erro', 'Você deve aceitar os termos e condições para continuar.');
+      return;
+    }
+    if (!nome || !email || !senha ) {
+      Alert.alert('Erro', 'Todos os campos são obrigatórios.');
+      return;
+    }
+    if (senha !== confirmarSenha || confirmarSenha !== senha) {
+      Alert.alert('Erro', 'A senha e a confirmação de senha devem ser iguais.');
+      return;
+    }
     navigation.goBack(); // Corrigido para voltar para a tela anterior
   };
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardStatus(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardStatus(false);
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Cadastro</Text>
-      <TextInput style={styles.input} placeholder="Nome" />
-      <TextInput style={styles.input} placeholder="Email" />
-      <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} />
-      <TextInput style={styles.input} placeholder="Confirmar Senha" secureTextEntry={true} />
-      <TouchableOpacity style={styles.button} onPress={handleNavigateBack}>
-        <Text style={styles.buttonText}>Voltar</Text>
+    <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+      <View style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={navigateToInicioScreen}>
+        <MaterialIcons name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
-    </View>
+        {!keyboardStatus && (
+          <Text style={styles.appName}>
+            <Text style={styles.blueText}>Cadastro</Text>
+          </Text>
+        )}
+        <InputField placeholder="Nome" />
+        <InputField placeholder="Email" />
+        <InputField placeholder="Senha" secureTextEntry={true} />
+        <InputField placeholder="Confirmar Senha" secureTextEntry={true} />
+        <CheckBox label="Aceito os termos e condições" checked={checked} onChange={() => setChecked(!checked)} />
+        <Button text="CONFIRMAR" onPress={handleNavigateBack} disabled={!checked} />
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -28,35 +100,72 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#120f25',
   },
-  title: {
-    fontSize: 24,
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    padding: 10,
+  },
+  appName: {
+    position: 'absolute',
+    top: 60,
+    color: 'rgba(33, 33, 33, 0.9)',
+    fontSize: 36,
     fontWeight: 'bold',
-    marginBottom: 20,
+  },
+  blueText: {
+    color: '#fff',
+    fontSize:40,
   },
   input: {
-    width: '80%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    width: '90%',
+    height: 50,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  button: {
-    backgroundColor: '#007bff',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 10,
-  },
-  buttonText: {
+    paddingLeft: 10,
+    borderRadius: 10,
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  },
+  loginButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    width:'90%',
+    borderRadius: 10,
+    marginTop: 50,
+    alignItems:'center'
+  },
+  loginButtonText: {
+    color: '#FFA000',
+    fontSize: 20,
+    fontFamily: 'CorporateSBold',
+  },
+
+  checkBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    alignSelf: 'flex-start',
+    marginLeft: '5%',
+    marginTop:10
+  },
+  checkBoxLabel: {
+    color: '#fff',
+    marginLeft: 8,
+  },
+
+  loginButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    width:'90%',
+    borderRadius: 10,
+    marginTop: 50,
+    alignItems:'center'
+  },
+  disabledButton: {
+    opacity: 0.9,
   },
 });
 
 export default CadastroScreen;
-

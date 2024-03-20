@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as Font from 'expo-font';
+import { Keyboard } from 'react-native';
 
 
 
@@ -11,6 +12,28 @@ const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true); // or some other action
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false); // or some other action
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+  
 
   const handleLoginPress = () => {
     console.log('Email:', email);
@@ -22,7 +45,7 @@ const LoginScreen = () => {
   };
 
   const handleForgotPassword = () => {
-    console.log('Esqueci a senha');
+    navigation.navigate('EsqueciSenhaScreen');
   };
   Font.loadAsync({
     'CorporateSBold': require('../../../assets/fonts/CorporateSBold.otf'), // Ajuste o caminho para sua fonte
@@ -34,10 +57,13 @@ const LoginScreen = () => {
       <TouchableOpacity style={styles.backButton} onPress={navigateToInicioScreen}>
         <MaterialIcons name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
-      <Text style={styles.appName}>
-        <Text style={styles.blueText}>HIPERTROF</Text>
-        <Text style={styles.orangeText}>.IA</Text>
-      </Text>
+      {!isKeyboardVisible && (
+          <Text style={styles.appName}>
+            <Text style={styles.blueText}>HIPERTROF</Text>
+            <Text style={styles.orangeText}>.IA</Text>
+          </Text>
+        )}
+        <Text style={styles.descriptionText}>Digite sua senha e email para entrar</Text>
       <TextInput
         style={styles.input}
         placeholder="Email ou nome de usuário"
@@ -83,6 +109,14 @@ const styles = StyleSheet.create({
     left: 20,
     padding: 10,
   },
+  descriptionText: {
+    marginLeft:0,
+    color: '#fff',
+    fontSize: 18,
+    marginTop: -100,
+    marginBottom:30, // Adicione o espaçamento desejado entre os textos
+    fontFamily: 'CorporateSBold',
+  },
   appName: {
     position: 'absolute',
     top: 60,
@@ -92,11 +126,11 @@ const styles = StyleSheet.create({
   },
   blueText: {
     color: '#fff',
-    fontSize:40,
+    fontSize:50,
   },
   orangeText: {
     color: '#FFA000',
-    fontSize:40,
+    fontSize:50,
   },
   input: {
     width: '90%',

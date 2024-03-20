@@ -18,7 +18,7 @@ const IndexScreen = () => {
   useEffect(() => {
     loadFont();
     const timer = setTimeout(() => {
-      navigation.navigate('Inicio');
+      navigation.navigate('InicioScreen');
     }, 2500);
 
     return () => clearTimeout(timer);
