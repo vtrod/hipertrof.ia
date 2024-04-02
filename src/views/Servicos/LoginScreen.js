@@ -35,10 +35,10 @@ const LoginScreen = () => {
   }, []);
   
 
-  const handleLoginPress = () => {
-    console.log('Email:', email);
-    console.log('Senha:', password);
-  };
+  //const handleLoginPress = () => {
+  //  console.log('Email:', email);
+  //  console.log('Senha:', password);
+  //};
 
   const navigateToInicioScreen = () => {
     navigation.navigate('InicioScreen');
@@ -47,6 +47,11 @@ const LoginScreen = () => {
   const handleForgotPassword = () => {
     navigation.navigate('EsqueciSenhaScreen');
   };
+
+  const handleLoginPress = () => {
+    navigation.navigate('UserScreen');
+  };
+
   Font.loadAsync({
     'CorporateSBold': require('../../../assets/fonts/CorporateSBold.otf'), // Ajuste o caminho para sua fonte
   });
