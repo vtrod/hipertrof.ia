@@ -25,11 +25,24 @@ const UserScreenContent = ({ navigation }) => {
   const [exercisePreferences, setExercisePreferences] = useState('');
   const [selectedAge, setSelectedAge] = useState(''); // idade selecionada
   const ages = Array.from(Array(89), (_, i) => i + 12); // Lista de idades de 12 a 100 anos
+  const [trainingDays, setTrainingDays] = useState(''); // Estado para os dias da semana
+  const [trainingHours, setTrainingHours] = useState(''); // Estado para as horas de treinamento
 
   const handleGenerateTraining = () => {
     // Lógica para gerar o treino com IA
     console.log('Treino gerado com sucesso!');
   };
+  
+  const fitnessLevels = [
+    { label: 'Escolha uma das opções abaixo', value: '' },
+    { label: 'Levemente acima do peso', value: 'Levemente acima do peso' },
+    { label: 'Bastante acima do peso', value: 'Bastante acima do peso' },
+    { label: 'Magro', value: 'Magro' },
+    { label: 'Falso magro', value: 'Falso magro' },
+    { label: 'Normal', value: 'Normal' },
+    { label: 'Atlético', value: 'Atlético' },
+    { label: 'Musculoso', value: 'Musculoso' }
+  ];
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -55,41 +68,90 @@ const UserScreenContent = ({ navigation }) => {
           />
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Idade:</Text>
+            <View style={styles.pickerContainer}>
             <Picker
               style={styles.picker}
               selectedValue={selectedAge}
               onValueChange={(itemValue) => setSelectedAge(itemValue)}
             >
-              <Picker.Item label="Selecione sua idade" value="" />
+              <Picker.Item label="Selecione sua idade" value="" color="#666666"/>
               {ages.map((age) => (
-                <Picker.Item key={age} label={`${age} anos`} value={age} />
+                <Picker.Item key={age} label={`${age} anos`} value={age}  color="#666666"/>
               ))}
             </Picker>
           </View>
+          </View>
+          <View style={styles.inputContainer}>
+  <Text style={styles.inputLabel}>Sexo:</Text>
+  <View style={styles.pickerContainer}>
+    <Picker
+      style={styles.picker}
+      selectedValue={sex}
+      onValueChange={(itemValue) => setSex(itemValue)}
+    >
+      <Picker.Item label="Selecione o sexo" value="" color="#666666" />
+      <Picker.Item label="Masculino" value="Masculino" />
+      <Picker.Item label="Feminino" value="Feminino" />
+    </Picker>
+  </View>
+</View>
+
+
+
+<View style={styles.inputContainer}>
+  <Text style={styles.inputLabel}>Você se considera:</Text>
+  <View style={styles.pickerContainer} marginLeft="-10">
+    <Picker
+      style={styles.picker}
+      selectedValue={fitnessLevel}
+      onValueChange={(itemValue) => setFitnessLevel(itemValue)}
+    >
+      {fitnessLevels.map((level, index) => (
+        <Picker.Item key={index} label={level.label} value={level.value} color="#666666" />
+      ))}
+    </Picker>
+</View>
+</View>
+
+
+
           <TextInput
             style={styles.input}
-            placeholder="Sexo"
-            value={sex}
-            onChangeText={setSex}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Nível de condicionamento físico atual"
-            value={fitnessLevel}
-            onChangeText={setFitnessLevel}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Histórico de lesões"
+            placeholder="Histórico de lesões (se houver)"
             value={injuryHistory}
             onChangeText={setInjuryHistory}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Disponibilidade de tempo para treinar (dias por semana e tempo por sessão)"
-            value={trainingAvailability}
-            onChangeText={setTrainingAvailability}
-          />
+
+<Text style={[styles.inputLabel, { marginBottom: -15 }]}>Dias/Semana:</Text>
+<View style={styles.inputContainer1}>
+  <View style={[styles.daysInputContainer, styles.inputWithBorder]}>
+    <Picker
+      style={styles.picker}
+      selectedValue={trainingDays}
+      onValueChange={(itemValue) => setTrainingDays(itemValue)}
+    >
+      {/* Opções para os dias da semana */}
+      <Picker.Item label="1" value="1" />
+      <Picker.Item label="2" value="2" />
+      <Picker.Item label="3" value="3" />
+      <Picker.Item label="4" value="4" />
+      <Picker.Item label="5" value="5" />
+      <Picker.Item label="6" value="6" />
+      <Picker.Item label="7" value="7" />
+    </Picker>
+  </View>
+  <View style={styles.hoursInputContainer}>
+    <Text style={styles.inputLabel}>Horas/Dia:</Text>
+    <TextInput
+      style={styles.input}
+      placeholder="Horas"
+      keyboardType="numeric"
+      value={trainingHours}
+      onChangeText={setTrainingHours}
+    />
+  </View>
+</View>
+
           <TextInput
             style={styles.input}
             placeholder="Equipamento disponível"
@@ -98,13 +160,7 @@ const UserScreenContent = ({ navigation }) => {
           />
           <TextInput
             style={styles.input}
-            placeholder="Objetivos específicos de hipertrofia"
-            value={specificGoals}
-            onChangeText={setSpecificGoals}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Preferências de exercício"
+            placeholder="Limitação em exercício(s) (se houver)"
             value={exercisePreferences}
             onChangeText={setExercisePreferences}
           />
@@ -149,7 +205,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 15,
+    color: '#b5b5b5', // Define a cor do texto dentro do Picker
+    backgroundColor: '#fff', // Define o background color do Picker
   },
+
+  //view do select
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -157,13 +217,32 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
-    padding: 0,
-    paddingLeft:15,
+    padding: 0, // Adicionando preenchimento para separar o texto dos campos
+    paddingLeft:10,
   },
+
+  inputContainer1: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+
+  inputContainerDispo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius:5,
+    height:50,
+  },
+
   inputLabel: {
-    marginRight: 10,
-    color: '#000',
-    fontSize: 16,
+    marginRight: 0,
+    color: '#666666',
+    fontSize: 14,
+    borderRadius: 10,
+    marginBottom: 0, // Removendo a margem inferior
   },
   button: {
     backgroundColor: 'blue',
@@ -184,10 +263,66 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignItems:'center'
   },
+
+pickerContainer: {
+  flex: 1,
+  borderWidth: 0.01,
+  borderColor: '',
+  borderRadius: 5,
+  marginLeft: 10,
+  height:50,
+  backgroundColor: '#fff',
+  overflow: 'hidden', // Garante que o conteúdo extra seja cortado
+},
+
   picker: {
-    flex: 1,
-    height: 10,
+    height: 5,
+    color: '#b5b5b5',
+    backgroundColor: '#fff',
   },
+
+//disponibilidade de tempo
+timeInputContainer: {
+  flexDirection: 'row', // Para colocar os campos em linha
+  alignItems: 'center',
+  flex: 1, // Para ocupar o espaço disponível
+},
+timePicker: {
+  flex: 1,
+  marginRight: 10,
+},
+hoursInput: {
+  flex: 1,
+},
+
+daysInputContainer: {
+  flex: 1,
+  marginRight: 10,
+  flexDirection: 'column',
+  overflow: 'hidden', // Garante que o conteúdo extra seja cortado
+  paddingBottom: 46,
+  paddingTop: -10,
+  marginTop:6,
+
+
+},
+hoursInputContainer: {
+  flex: 1,
+},
+inputLabel: {
+  color: '#666666',
+  fontSize: 14,
+  marginBottom: 5,
+  
+},
+inputWithBorder: {
+  borderWidth: 1,
+  borderColor: '#ccc',
+  borderRadius: 5,
+  height:40,
+  
+
+},
 });
 
 export default UserScreen;
