@@ -26,7 +26,7 @@ const InicioScreen: React.FC = () => {
   };
 
   const handleNavigateToSignUp = () => {
-    navigation.navigate('CadastroScreen');
+    navigation.navigate('Cadastro');
   };
 
   return (

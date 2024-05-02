@@ -2,11 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { MaterialIcons } from '@expo/vector-icons'; // Importe o pacote de ícones
+import { MaterialIcons } from '@expo/vector-icons';
+import { cadastrar } from '../../servicos/requisicoesFirebase';
+import { Alerta } from '../../componentes/Alerta/index';
 
+
+ 
 interface InputFieldProps {
   placeholder: string;
   secureTextEntry?: boolean;
+  onChangeText?: (text: string) => void;
+  error: boolean; 
+  messageError: string;
 }
 
 interface ButtonProps {
@@ -21,9 +28,16 @@ interface CheckBoxProps {
   onChange: () => void;
 }
 
-const InputField: React.FC<InputFieldProps> = ({ placeholder, secureTextEntry }) => (
-  <TextInput style={styles.input} placeholder={placeholder} placeholderTextColor="#fff" secureTextEntry={secureTextEntry} />
-);
+const InputField: React.FC<InputFieldProps> = ({ placeholder, secureTextEntry, onChangeText, error, messageError }) => (
+
+<TextInput
+  style={[styles.input, error && styles.inputError]} 
+  placeholder={placeholder}
+  placeholderTextColor="#fff"
+  secureTextEntry={secureTextEntry}
+  onChangeText={onChangeText}
+/>
+)
 
 const Button: React.FC<ButtonProps> = ({ text, onPress, disabled }) => (
   <TouchableOpacity style={[styles.loginButton, disabled && styles.disabledButton]} onPress={onPress} disabled={disabled}>
@@ -48,9 +62,13 @@ const CadastroScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [statusError, setStatusError] = useState('');
+  const [mensagemError, setMensagemError] = useState(''); 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
+
   useEffect(() => {
+
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
@@ -71,23 +89,7 @@ const CadastroScreen: React.FC = () => {
   }, []);
 
   const navigateToInicioScreen = () => {
-    navigation.navigate('InicioScreen');
-  };
-
-  const handleNavigateBack = () => {
-    if (!checked) {
-      Alert.alert('Erro', 'Você deve aceitar os termos e condições para continuar.');
-      return;
-    }
-    if (!nome || !email || !senha || !confirmarSenha) {
-      Alert.alert('Erro', 'Todos os campos são obrigatórios.');
-      return;
-    }
-    if (senha !== confirmarSenha || confirmarSenha !== senha) {
-      Alert.alert('Erro', 'A senha e a confirmação de senha devem ser iguais.');
-      return;
-    }
-    navigation.goBack(); // Corrigido para voltar para a tela anterior
+    navigation.navigate('InicioScreen' as never);
   };
 
   useEffect(() => {
@@ -109,6 +111,29 @@ const CadastroScreen: React.FC = () => {
       keyboardDidShowListener.remove();
     };
   }, []);
+  async function realizarCadastro() {
+    if (email == ''){
+      setMensagemError('Preencha com o seu email');
+      setStatusError('email')
+    } else if (senha == ''){
+      setMensagemError('Digite uma senha');
+      setStatusError('senha')
+    } else if (confirmarSenha == ''){
+      setMensagemError('Confirme a sua senha');
+      setStatusError('confirmarSenha')
+    } else{
+      const resultado = await cadastrar(email, senha, confirmarSenha);
+      setStatusError('firebase')
+      if( resultado == 'sucesso') {
+        setMensagemError('Usuário cadastrado com sucesso!')
+        setEmail('')
+        setSenha('')
+        setConfirmarSenha('')
+      } else {
+        setMensagemError(resultado)
+      }
+    }
+  }
 
   return (
     <KeyboardAvoidingView behavior={null} style={{ flex: 1 }}>
@@ -123,12 +148,42 @@ const CadastroScreen: React.FC = () => {
           </Text> 
         )}
         <Text style={styles.regdescription}>Digite suas informações para cadastro</Text>
-        <InputField placeholder="Nome" />
-        <InputField placeholder="Email" />
-        <InputField placeholder="Senha" secureTextEntry={true} />
-        <InputField placeholder="Confirmar Senha" secureTextEntry={true} />
+        <InputField 
+        placeholder="Nome" 
+        onChangeText={texto => setNome(texto)} 
+        error={statusError == 'nome'}
+        messageError={mensagemError}
+        />
+        <InputField 
+        placeholder="Email"
+        value={email} 
+        onChangeText={texto => setEmail(texto)} 
+        error={statusError == 'email'} 
+        messageError={mensagemError}
+        />
+        <InputField 
+        placeholder="Senha" 
+        secureTextEntry={true} 
+        onChangeText={texto => setSenha(texto)} 
+        error={statusError == 'senha'}
+        messageError={mensagemError}
+        /> 
+        <InputField 
+        placeholder="Confirmar Senha" 
+        secureTextEntry={true} 
+        onChangeText={texto => setConfirmarSenha(texto)}
+         error={statusError == 'confirmarSenha'}
+         messageError={mensagemError}
+         />
+
+        <Alerta 
+          mensagem={mensagemError}
+          error = {statusError == 'firebase'}
+          setError={setStatusError}
+        />
+
         <CheckBox label="Aceito os termos e condições" checked={checked} onChange={() => setChecked(!checked)} />
-        <Button text="CONFIRMAR" onPress={handleNavigateBack} disabled={!checked} />
+        <Button text="CONFIRMAR" onPress={realizarCadastro} disabled={!checked} />
       </View>
     </KeyboardAvoidingView>
   );
@@ -205,6 +260,15 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.9,
+  },
+  inputError: {
+    borderColor: 'red', 
+    borderWidth: 2, 
+  },
+  errorMessage: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 4,
   },
 });
 
